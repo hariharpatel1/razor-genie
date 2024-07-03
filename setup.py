@@ -36,12 +36,12 @@ print("Packages:", packages)
 extras = "dev help browser playwright".split()
 
 setup(
-    name="aider-chat",
+    name="razor-genie",
     version=__version__,
     packages=packages,
     include_package_data=True,
     package_data={
-        "aider": ["queries/*.scm"],
+        "razor_genie": ["queries/*.scm"],
         "aider.website": ["**/*.md"],
     },
     exclude_package_data={"aider.website": exclude_website_pats},
@@ -50,10 +50,10 @@ setup(
     python_requires=">=3.9,<3.13",
     entry_points={
         "console_scripts": [
-            "aider = aider.main:main",
+            "razorgenie = aider.main:main",
         ],
     },
-    description="Aider is AI pair programming in your terminal",
+    description="Razorgenie is a AI pair programming in your terminal",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/paul-gauthier/aider",

@@ -1,0 +1,2 @@
+[console_scripts]
+razorgenie = aider.main:main
