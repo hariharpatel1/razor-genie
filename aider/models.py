@@ -64,7 +64,7 @@ class ModelSettings:
     name: str
     edit_format: str = "whole"
     weak_model_name: Optional[str] = None
-    use_repo_map: bool = False
+    use_repo_map: bool = True
     send_undo_reply: bool = False
     accepts_images: bool = False
     lazy: bool = False
@@ -378,6 +378,21 @@ MODEL_SETTINGS = [
 
 
 class Model:
+    name = None
+
+    edit_format = "whole"
+    use_repo_map = True
+    send_undo_reply = False
+    accepts_images = False
+    weak_model_name = None
+    lazy = False
+    reminder_as_sys_msg = False
+    examples_as_sys_msg = False
+    can_prefill = False
+
+    max_chat_history_tokens = 1024
+    weak_model = None
+
     def __init__(self, model, weak_model=None):
         # Set defaults from ModelSettings
         default_settings = ModelSettings(name="")
@@ -456,6 +471,12 @@ class Model:
             self.use_repo_map = True
             self.send_undo_reply = True
             return  # <--
+
+        if "azure/Habibi-4o" in model or "claude-3-opus" in model:
+            self.edit_format = "diff"
+            self.use_repo_map = True
+            self.send_undo_reply = True
+            return
 
         if "gpt-3.5" in model or "gpt-4" in model:
             self.reminder_as_sys_msg = True
