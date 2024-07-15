@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: razor-genie
-Version: 0.41.1.dev0
+Version: 0.43.5.dev0
 Summary: Razorgenie is a AI pair programming in your terminal
 Home-page: https://github.com/paul-gauthier/aider
 Classifier: Development Status :: 4 - Beta
@@ -19,15 +19,12 @@ Description-Content-Type: text/markdown
 License-File: LICENSE.txt
 Requires-Dist: aiohttp==3.9.5
 Requires-Dist: aiosignal==1.3.1
-Requires-Dist: altair==5.3.0
 Requires-Dist: annotated-types==0.7.0
 Requires-Dist: anyio==4.4.0
 Requires-Dist: attrs==23.2.0
 Requires-Dist: backoff==2.2.1
 Requires-Dist: beautifulsoup4==4.12.3
-Requires-Dist: blinker==1.8.2
-Requires-Dist: cachetools==5.3.3
-Requires-Dist: certifi==2024.6.2
+Requires-Dist: certifi==2024.7.4
 Requires-Dist: cffi==1.16.0
 Requires-Dist: charset-normalizer==3.3.2
 Requires-Dist: click==8.1.7
@@ -41,93 +38,244 @@ Requires-Dist: frozenlist==1.4.1
 Requires-Dist: fsspec==2024.6.1
 Requires-Dist: gitdb==4.0.11
 Requires-Dist: gitpython==3.1.43
-Requires-Dist: google-ai-generativelanguage==0.6.6
-Requires-Dist: google-api-core[grpc]==2.19.1
-Requires-Dist: google-api-python-client==2.135.0
-Requires-Dist: google-auth==2.30.0
-Requires-Dist: google-auth-httplib2==0.2.0
-Requires-Dist: google-generativeai==0.7.1
-Requires-Dist: googleapis-common-protos==1.63.2
-Requires-Dist: greenlet==3.0.3
 Requires-Dist: grep-ast==0.3.2
-Requires-Dist: grpcio==1.64.1
-Requires-Dist: grpcio-status==1.62.2
 Requires-Dist: h11==0.14.0
 Requires-Dist: httpcore==1.0.5
-Requires-Dist: httplib2==0.22.0
 Requires-Dist: httpx==0.27.0
 Requires-Dist: huggingface-hub==0.23.4
 Requires-Dist: idna==3.7
-Requires-Dist: ijson==3.3.0
 Requires-Dist: importlib-metadata==7.2.1
+Requires-Dist: importlib-resources==6.4.0
 Requires-Dist: jinja2==3.1.4
 Requires-Dist: jsonschema==4.22.0
 Requires-Dist: jsonschema-specifications==2023.12.1
-Requires-Dist: litellm==1.41.0
+Requires-Dist: litellm==1.41.6
 Requires-Dist: markdown-it-py==3.0.0
 Requires-Dist: markupsafe==2.1.5
 Requires-Dist: mccabe==0.7.0
 Requires-Dist: mdurl==0.1.2
 Requires-Dist: multidict==6.0.5
 Requires-Dist: networkx==3.2.1
-Requires-Dist: numpy==2.0.0
-Requires-Dist: openai==1.35.7
+Requires-Dist: numpy==1.26.4
+Requires-Dist: openai==1.35.10
 Requires-Dist: packaging==24.1
-Requires-Dist: pandas==2.2.2
 Requires-Dist: pathspec==0.12.1
-Requires-Dist: pillow==10.3.0
-Requires-Dist: playwright==1.44.0
+Requires-Dist: pillow==10.4.0
 Requires-Dist: prompt-toolkit==3.0.47
-Requires-Dist: proto-plus==1.24.0
-Requires-Dist: protobuf==4.25.3
-Requires-Dist: pyarrow==16.1.0
-Requires-Dist: pyasn1==0.6.0
-Requires-Dist: pyasn1-modules==0.4.0
 Requires-Dist: pycodestyle==2.12.0
 Requires-Dist: pycparser==2.22
-Requires-Dist: pydantic==2.7.4
-Requires-Dist: pydantic-core==2.18.4
-Requires-Dist: pydeck==0.9.1
-Requires-Dist: pyee==11.1.0
+Requires-Dist: pydantic==2.8.2
+Requires-Dist: pydantic-core==2.20.1
 Requires-Dist: pyflakes==3.2.0
 Requires-Dist: pygments==2.18.0
 Requires-Dist: pypandoc==1.13
-Requires-Dist: pyparsing==3.1.2
-Requires-Dist: python-dateutil==2.9.0.post0
 Requires-Dist: python-dotenv==1.0.1
-Requires-Dist: pytz==2024.1
 Requires-Dist: pyyaml==6.0.1
 Requires-Dist: referencing==0.35.1
 Requires-Dist: regex==2024.5.15
 Requires-Dist: requests==2.32.3
 Requires-Dist: rich==13.7.1
 Requires-Dist: rpds-py==0.18.1
-Requires-Dist: rsa==4.9
 Requires-Dist: scipy==1.13.1
-Requires-Dist: six==1.16.0
 Requires-Dist: smmap==5.0.1
 Requires-Dist: sniffio==1.3.1
 Requires-Dist: sounddevice==0.4.7
 Requires-Dist: soundfile==0.12.1
 Requires-Dist: soupsieve==2.5
-Requires-Dist: streamlit==1.36.0
-Requires-Dist: tenacity==8.4.2
 Requires-Dist: tiktoken==0.7.0
 Requires-Dist: tokenizers==0.19.1
-Requires-Dist: toml==0.10.2
-Requires-Dist: toolz==0.12.1
-Requires-Dist: tornado==6.4.1
 Requires-Dist: tqdm==4.66.4
 Requires-Dist: tree-sitter==0.21.3
 Requires-Dist: tree-sitter-languages==1.10.2
 Requires-Dist: typing-extensions==4.12.2
-Requires-Dist: tzdata==2024.1
-Requires-Dist: uritemplate==4.1.1
 Requires-Dist: urllib3==2.2.2
-Requires-Dist: watchdog==4.0.1
 Requires-Dist: wcwidth==0.2.13
 Requires-Dist: yarl==1.9.4
 Requires-Dist: zipp==3.19.2
+Provides-Extra: dev
+Requires-Dist: alabaster==0.7.16; extra == "dev"
+Requires-Dist: babel==2.15.0; extra == "dev"
+Requires-Dist: build==1.2.1; extra == "dev"
+Requires-Dist: certifi==2024.7.4; extra == "dev"
+Requires-Dist: cfgv==3.4.0; extra == "dev"
+Requires-Dist: charset-normalizer==3.3.2; extra == "dev"
+Requires-Dist: click==8.1.7; extra == "dev"
+Requires-Dist: cogapp==3.4.1; extra == "dev"
+Requires-Dist: contourpy==1.2.1; extra == "dev"
+Requires-Dist: cycler==0.12.1; extra == "dev"
+Requires-Dist: dill==0.3.8; extra == "dev"
+Requires-Dist: distlib==0.3.8; extra == "dev"
+Requires-Dist: docutils==0.20.1; extra == "dev"
+Requires-Dist: filelock==3.15.4; extra == "dev"
+Requires-Dist: fonttools==4.53.1; extra == "dev"
+Requires-Dist: identify==2.5.36; extra == "dev"
+Requires-Dist: idna==3.7; extra == "dev"
+Requires-Dist: imagesize==1.4.1; extra == "dev"
+Requires-Dist: imgcat==0.5.0; extra == "dev"
+Requires-Dist: iniconfig==2.0.0; extra == "dev"
+Requires-Dist: jinja2==3.1.4; extra == "dev"
+Requires-Dist: kiwisolver==1.4.5; extra == "dev"
+Requires-Dist: lox==0.12.0; extra == "dev"
+Requires-Dist: markdown-it-py==3.0.0; extra == "dev"
+Requires-Dist: markupsafe==2.1.5; extra == "dev"
+Requires-Dist: matplotlib==3.9.1; extra == "dev"
+Requires-Dist: mdurl==0.1.2; extra == "dev"
+Requires-Dist: multiprocess==0.70.16; extra == "dev"
+Requires-Dist: nodeenv==1.9.1; extra == "dev"
+Requires-Dist: numpy==1.26.4; extra == "dev"
+Requires-Dist: packaging==24.1; extra == "dev"
+Requires-Dist: pandas==2.2.2; extra == "dev"
+Requires-Dist: pathos==0.3.2; extra == "dev"
+Requires-Dist: pillow==10.4.0; extra == "dev"
+Requires-Dist: pip-tools==7.4.1; extra == "dev"
+Requires-Dist: platformdirs==4.2.2; extra == "dev"
+Requires-Dist: pluggy==1.5.0; extra == "dev"
+Requires-Dist: pox==0.3.4; extra == "dev"
+Requires-Dist: ppft==1.7.6.8; extra == "dev"
+Requires-Dist: pre-commit==3.7.1; extra == "dev"
+Requires-Dist: pygments==2.18.0; extra == "dev"
+Requires-Dist: pyparsing==3.1.2; extra == "dev"
+Requires-Dist: pyproject-hooks==1.1.0; extra == "dev"
+Requires-Dist: pytest==8.2.2; extra == "dev"
+Requires-Dist: python-dateutil==2.9.0.post0; extra == "dev"
+Requires-Dist: pytz==2024.1; extra == "dev"
+Requires-Dist: pyyaml==6.0.1; extra == "dev"
+Requires-Dist: requests==2.32.3; extra == "dev"
+Requires-Dist: rich==13.7.1; extra == "dev"
+Requires-Dist: shellingham==1.5.4; extra == "dev"
+Requires-Dist: six==1.16.0; extra == "dev"
+Requires-Dist: snowballstemmer==2.2.0; extra == "dev"
+Requires-Dist: sphinx==7.3.7; extra == "dev"
+Requires-Dist: sphinx-rtd-theme==2.0.0; extra == "dev"
+Requires-Dist: sphinxcontrib-applehelp==1.0.8; extra == "dev"
+Requires-Dist: sphinxcontrib-devhelp==1.0.6; extra == "dev"
+Requires-Dist: sphinxcontrib-htmlhelp==2.0.5; extra == "dev"
+Requires-Dist: sphinxcontrib-jquery==4.1; extra == "dev"
+Requires-Dist: sphinxcontrib-jsmath==1.0.1; extra == "dev"
+Requires-Dist: sphinxcontrib-qthelp==1.0.7; extra == "dev"
+Requires-Dist: sphinxcontrib-serializinghtml==1.1.10; extra == "dev"
+Requires-Dist: typer==0.12.3; extra == "dev"
+Requires-Dist: typing-extensions==4.12.2; extra == "dev"
+Requires-Dist: tzdata==2024.1; extra == "dev"
+Requires-Dist: urllib3==2.2.2; extra == "dev"
+Requires-Dist: virtualenv==20.26.3; extra == "dev"
+Requires-Dist: wheel==0.43.0; extra == "dev"
+Provides-Extra: hf-embed
+Requires-Dist: aiohttp==3.9.5; extra == "hf-embed"
+Requires-Dist: aiosignal==1.3.1; extra == "hf-embed"
+Requires-Dist: annotated-types==0.7.0; extra == "hf-embed"
+Requires-Dist: anyio==4.4.0; extra == "hf-embed"
+Requires-Dist: attrs==23.2.0; extra == "hf-embed"
+Requires-Dist: certifi==2024.7.4; extra == "hf-embed"
+Requires-Dist: charset-normalizer==3.3.2; extra == "hf-embed"
+Requires-Dist: click==8.1.7; extra == "hf-embed"
+Requires-Dist: dataclasses-json==0.6.7; extra == "hf-embed"
+Requires-Dist: deprecated==1.2.14; extra == "hf-embed"
+Requires-Dist: dirtyjson==1.0.8; extra == "hf-embed"
+Requires-Dist: distro==1.9.0; extra == "hf-embed"
+Requires-Dist: filelock==3.15.4; extra == "hf-embed"
+Requires-Dist: frozenlist==1.4.1; extra == "hf-embed"
+Requires-Dist: fsspec==2024.6.1; extra == "hf-embed"
+Requires-Dist: greenlet==3.0.3; extra == "hf-embed"
+Requires-Dist: h11==0.14.0; extra == "hf-embed"
+Requires-Dist: httpcore==1.0.5; extra == "hf-embed"
+Requires-Dist: httpx==0.27.0; extra == "hf-embed"
+Requires-Dist: huggingface-hub[inference]==0.23.4; extra == "hf-embed"
+Requires-Dist: idna==3.7; extra == "hf-embed"
+Requires-Dist: jinja2==3.1.4; extra == "hf-embed"
+Requires-Dist: joblib==1.4.2; extra == "hf-embed"
+Requires-Dist: llama-cloud==0.0.6; extra == "hf-embed"
+Requires-Dist: llama-index-core==0.10.52.post2; extra == "hf-embed"
+Requires-Dist: llama-index-embeddings-huggingface==0.2.2; extra == "hf-embed"
+Requires-Dist: markupsafe==2.1.5; extra == "hf-embed"
+Requires-Dist: marshmallow==3.21.3; extra == "hf-embed"
+Requires-Dist: minijinja==2.0.1; extra == "hf-embed"
+Requires-Dist: mpmath==1.3.0; extra == "hf-embed"
+Requires-Dist: multidict==6.0.5; extra == "hf-embed"
+Requires-Dist: mypy-extensions==1.0.0; extra == "hf-embed"
+Requires-Dist: nest-asyncio==1.6.0; extra == "hf-embed"
+Requires-Dist: networkx==3.2.1; extra == "hf-embed"
+Requires-Dist: nltk==3.8.1; extra == "hf-embed"
+Requires-Dist: numpy==1.26.4; extra == "hf-embed"
+Requires-Dist: openai==1.35.10; extra == "hf-embed"
+Requires-Dist: packaging==24.1; extra == "hf-embed"
+Requires-Dist: pandas==2.2.2; extra == "hf-embed"
+Requires-Dist: pillow==10.4.0; extra == "hf-embed"
+Requires-Dist: pydantic==2.8.2; extra == "hf-embed"
+Requires-Dist: pydantic-core==2.20.1; extra == "hf-embed"
+Requires-Dist: python-dateutil==2.9.0.post0; extra == "hf-embed"
+Requires-Dist: pytz==2024.1; extra == "hf-embed"
+Requires-Dist: pyyaml==6.0.1; extra == "hf-embed"
+Requires-Dist: regex==2024.5.15; extra == "hf-embed"
+Requires-Dist: requests==2.32.3; extra == "hf-embed"
+Requires-Dist: safetensors==0.4.3; extra == "hf-embed"
+Requires-Dist: scikit-learn==1.5.1; extra == "hf-embed"
+Requires-Dist: scipy==1.13.1; extra == "hf-embed"
+Requires-Dist: sentence-transformers==3.0.1; extra == "hf-embed"
+Requires-Dist: six==1.16.0; extra == "hf-embed"
+Requires-Dist: sniffio==1.3.1; extra == "hf-embed"
+Requires-Dist: sqlalchemy[asyncio]==2.0.31; extra == "hf-embed"
+Requires-Dist: sympy==1.13.0; extra == "hf-embed"
+Requires-Dist: tenacity==8.4.2; extra == "hf-embed"
+Requires-Dist: threadpoolctl==3.5.0; extra == "hf-embed"
+Requires-Dist: tiktoken==0.7.0; extra == "hf-embed"
+Requires-Dist: tokenizers==0.19.1; extra == "hf-embed"
+Requires-Dist: torch==2.2.2; extra == "hf-embed"
+Requires-Dist: tqdm==4.66.4; extra == "hf-embed"
+Requires-Dist: transformers==4.42.3; extra == "hf-embed"
+Requires-Dist: typing-extensions==4.12.2; extra == "hf-embed"
+Requires-Dist: typing-inspect==0.9.0; extra == "hf-embed"
+Requires-Dist: tzdata==2024.1; extra == "hf-embed"
+Requires-Dist: urllib3==2.2.2; extra == "hf-embed"
+Requires-Dist: wrapt==1.16.0; extra == "hf-embed"
+Requires-Dist: yarl==1.9.4; extra == "hf-embed"
+Provides-Extra: browser
+Requires-Dist: altair==5.3.0; extra == "browser"
+Requires-Dist: attrs==23.2.0; extra == "browser"
+Requires-Dist: blinker==1.8.2; extra == "browser"
+Requires-Dist: cachetools==5.3.3; extra == "browser"
+Requires-Dist: certifi==2024.7.4; extra == "browser"
+Requires-Dist: charset-normalizer==3.3.2; extra == "browser"
+Requires-Dist: click==8.1.7; extra == "browser"
+Requires-Dist: gitdb==4.0.11; extra == "browser"
+Requires-Dist: gitpython==3.1.43; extra == "browser"
+Requires-Dist: idna==3.7; extra == "browser"
+Requires-Dist: jinja2==3.1.4; extra == "browser"
+Requires-Dist: jsonschema==4.22.0; extra == "browser"
+Requires-Dist: jsonschema-specifications==2023.12.1; extra == "browser"
+Requires-Dist: markdown-it-py==3.0.0; extra == "browser"
+Requires-Dist: markupsafe==2.1.5; extra == "browser"
+Requires-Dist: mdurl==0.1.2; extra == "browser"
+Requires-Dist: numpy==1.26.4; extra == "browser"
+Requires-Dist: packaging==24.1; extra == "browser"
+Requires-Dist: pandas==2.2.2; extra == "browser"
+Requires-Dist: pillow==10.4.0; extra == "browser"
+Requires-Dist: protobuf==4.25.3; extra == "browser"
+Requires-Dist: pyarrow==16.1.0; extra == "browser"
+Requires-Dist: pydeck==0.9.1; extra == "browser"
+Requires-Dist: pygments==2.18.0; extra == "browser"
+Requires-Dist: python-dateutil==2.9.0.post0; extra == "browser"
+Requires-Dist: pytz==2024.1; extra == "browser"
+Requires-Dist: referencing==0.35.1; extra == "browser"
+Requires-Dist: requests==2.32.3; extra == "browser"
+Requires-Dist: rich==13.7.1; extra == "browser"
+Requires-Dist: rpds-py==0.18.1; extra == "browser"
+Requires-Dist: six==1.16.0; extra == "browser"
+Requires-Dist: smmap==5.0.1; extra == "browser"
+Requires-Dist: streamlit==1.36.0; extra == "browser"
+Requires-Dist: tenacity==8.4.2; extra == "browser"
+Requires-Dist: toml==0.10.2; extra == "browser"
+Requires-Dist: toolz==0.12.1; extra == "browser"
+Requires-Dist: tornado==6.4.1; extra == "browser"
+Requires-Dist: typing-extensions==4.12.2; extra == "browser"
+Requires-Dist: tzdata==2024.1; extra == "browser"
+Requires-Dist: urllib3==2.2.2; extra == "browser"
+Requires-Dist: watchdog==4.0.1; extra == "browser"
+Provides-Extra: playwright
+Requires-Dist: greenlet==3.0.3; extra == "playwright"
+Requires-Dist: playwright==1.45.0; extra == "playwright"
+Requires-Dist: pyee==11.1.0; extra == "playwright"
+Requires-Dist: typing-extensions==4.12.2; extra == "playwright"
 
 
 <!-- Edit README.md, not index.md -->
@@ -137,8 +285,8 @@ Requires-Dist: zipp==3.19.2
 Aider lets you pair program with LLMs,
 to edit code in your local git repository.
 Start a new project or work with an existing git repo.
-Aider can [connect to almost any LLM](https://aider.chat/docs/llms.html).
-and works best with GPT-4o, Claude 3.5 Sonnet, Claude 3 Opus and DeepSeek Coder V2.
+Aider works best with GPT-4o & Claude 3.5 Sonnet and can 
+[connect to almost any LLM](https://aider.chat/docs/llms.html).
 
 <p align="center">
   <img
@@ -158,9 +306,9 @@ and works best with GPT-4o, Claude 3.5 Sonnet, Claude 3 Opus and DeepSeek Coder 
 
 ## Getting started
 <!--[[[cog
-# We can't do this here: {% include get-started.md %}
+# We can't "include" here.
 # Because this page is rendered by GitHub as the repo README
-cog.out(open("website/_includes/get-started.md").read())
+cog.out(open("aider/website/_includes/get-started.md").read())
 ]]]-->
 
 You can get started quickly like this:
@@ -199,16 +347,15 @@ for more details.
 - Aider will edit your files to complete your request.
 - Aider [automatically git commits](https://aider.chat/docs/git.html) changes with a sensible commit message.
 - Aider works with [most popular languages](https://aider.chat/docs/languages.html): python, javascript, typescript, php, html, css, and more...
-- Aider works best with GPT-4o and Claude 3 Opus
-and can [connect to almost any LLM](https://aider.chat/docs/llms.html).
+- Aider works best with GPT-4o & Claude 3.5 Sonnet and can [connect to almost any LLM](https://aider.chat/docs/llms.html).
 - Aider can edit multiple files at once for complex requests.
 - Aider uses a [map of your entire git repo](https://aider.chat/docs/repomap.html), which helps it work well in larger codebases.
 - Edit files in your editor while chatting with aider,
 and it will always use the latest version.
 Pair program with AI.
-- [Add images to the chat](https://aider.chat/docs/images-urls.html) (GPT-4o, Claude 3.5 Sonnet, etc).
-- [Add URLs to the chat](https://aider.chat/docs/images-urls.html) and aider will read their content.
-- [Code with your voice](https://aider.chat/docs/voice.html).
+- [Add images to the chat](https://aider.chat/docs/usage/images-urls.html) (GPT-4o, Claude 3.5 Sonnet, etc).
+- [Add URLs to the chat](https://aider.chat/docs/usage/images-urls.html) and aider will read their content.
+- [Code with your voice](https://aider.chat/docs/usage/voice.html).
 
 
 ## Top tier performance
@@ -223,7 +370,7 @@ projects like django, scikitlearn, matplotlib, etc.
 - [Documentation](https://aider.chat/)
 - [Installation](https://aider.chat/docs/install.html)
 - [Usage](https://aider.chat/docs/usage.html)
-- [Tutorial videos](https://aider.chat/docs/tutorials.html)
+- [Tutorial videos](https://aider.chat/docs/usage/tutorials.html)
 - [Connecting to LLMs](https://aider.chat/docs/llms.html)
 - [Configuration](https://aider.chat/docs/config.html)
 - [Troubleshooting](https://aider.chat/docs/troubleshooting.html)
@@ -252,4 +399,5 @@ projects like django, scikitlearn, matplotlib, etc.
 - *I am an aider addict. I'm getting so much more work done, but in less time.* -- [dandandan](https://discord.com/channels/1131200896827654144/1131200896827654149/1135913253483069470)
 - *After wasting $100 on tokens trying to find something better, I'm back to Aider. It blows everything else out of the water hands down, there's no competition whatsoever.* -- [SystemSculpt](https://discord.com/channels/1131200896827654144/1131200896827654149/1178736602797846548)
 - *Hands down, this is the best AI coding assistant tool so far.* -- [IndyDevDan](https://www.youtube.com/watch?v=MPYFPvxfGZs)
+- *[Aider] changed my daily coding workflows. It's mind-blowing how a single Python application can change your life.* -- [maledorak](https://discord.com/channels/1131200896827654144/1131200896827654149/1258453375620747264)
 - *Best agent for actual dev work in existing codebases.* -- [Nick Dobos](https://twitter.com/NickADobos/status/1690408967963652097?s=20)
