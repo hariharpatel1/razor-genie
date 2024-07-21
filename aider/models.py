@@ -477,6 +477,12 @@ class Model:
             self.use_repo_map = True
             self.send_undo_reply = True
             return
+        if "azure/habibi" in model or "claude-3-opus" in model:
+            self.edit_format = "diff"
+            self.use_repo_map = True
+            self.send_undo_reply = True
+            self.can_prefill = True
+            return
         if "bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0" in model or "claude-3-opus" in model:
             self.edit_format= "diff"
             self.use_repo_map = True
