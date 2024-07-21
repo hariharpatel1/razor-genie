@@ -477,6 +477,14 @@ class Model:
             self.use_repo_map = True
             self.send_undo_reply = True
             return
+        if "bedrock/anthropic.claude-3-5-sonnet-20240620-v1:0" in model or "claude-3-opus" in model:
+            self.edit_format= "diff"
+            self.use_repo_map = True
+            self.send_undo_reply= True
+            self.accepts_images= True
+            self.lazy=True
+            self.reminder_as_sys_msg=True
+            self.examples_as_sys_msg=True
 
         if "gpt-3.5" in model or "gpt-4" in model:
             self.reminder_as_sys_msg = True
