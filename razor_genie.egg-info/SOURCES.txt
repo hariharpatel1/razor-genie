@@ -119,16 +119,3 @@ razor_genie.egg-info/dependency_links.txt
 razor_genie.egg-info/entry_points.txt
 razor_genie.egg-info/requires.txt
 razor_genie.egg-info/top_level.txt
-tests/test_coder.py
-tests/test_commands.py
-tests/test_editblock.py
-tests/test_help.py
-tests/test_io.py
-tests/test_main.py
-tests/test_models.py
-tests/test_repo.py
-tests/test_repomap.py
-tests/test_sendchat.py
-tests/test_udiff.py
-tests/test_urls.py
-tests/test_wholefile.py
