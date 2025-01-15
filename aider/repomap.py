@@ -8,7 +8,6 @@ from collections import Counter, defaultdict, namedtuple
 from importlib import resources
 from pathlib import Path
 
-import networkx as nx
 from diskcache import Cache
 from grep_ast import TreeContext, filename_to_lang
 from pygments.lexers import guess_lexer_for_filename
@@ -42,6 +41,7 @@ class RepoMap:
         repo_content_prefix=None,
         verbose=False,
         max_context_window=None,
+        map_mul_no_files=8,
     ):
         self.io = io
         self.verbose = verbose
@@ -53,6 +53,7 @@ class RepoMap:
         self.load_tags_cache()
 
         self.max_map_tokens = map_tokens
+        self.map_mul_no_files = map_mul_no_files
         self.max_context_window = max_context_window
 
         self.token_count = main_model.token_count
@@ -71,10 +72,12 @@ class RepoMap:
         max_map_tokens = self.max_map_tokens
 
         # With no files in the chat, give a bigger view of the entire repo
-        MUL = 8
         padding = 4096
         if max_map_tokens and self.max_context_window:
-            target = min(max_map_tokens * MUL, self.max_context_window - padding)
+            target = min(
+                max_map_tokens * self.map_mul_no_files,
+                self.max_context_window - padding,
+            )
         else:
             target = 0
         if not chat_files and self.max_context_window and target > 0:
@@ -94,7 +97,7 @@ class RepoMap:
 
         num_tokens = self.token_count(files_listing)
         if self.verbose:
-            self.io.tool_output(f"Repo-map: {num_tokens/1024:.1f} k-tokens")
+            self.io.tool_output(f"Repo-map: {num_tokens / 1024:.1f} k-tokens")
 
         if chat_files:
             other = "other "
@@ -159,14 +162,7 @@ class RepoMap:
         language = get_language(lang)
         parser = get_parser(lang)
 
-        # Load the tags queries
-        try:
-            scm_fname = resources.files(__package__).joinpath(
-                "queries", f"tree-sitter-{lang}-tags.scm"
-            )
-        except KeyError:
-            return
-        query_scm = scm_fname
+        query_scm = get_scm_fname(lang)
         if not query_scm.exists():
             return
         query_scm = query_scm.read_text()
@@ -230,6 +226,8 @@ class RepoMap:
             )
 
     def get_ranked_tags(self, chat_fnames, other_fnames, mentioned_fnames, mentioned_idents):
+        import networkx as nx
+
         defines = defaultdict(set)
         references = defaultdict(list)
         definitions = defaultdict(set)
@@ -509,16 +507,34 @@ def get_random_color():
     return res
 
 
+def get_scm_fname(lang):
+    # Load the tags queries
+    try:
+        return resources.files(__package__).joinpath("queries", f"tree-sitter-{lang}-tags.scm")
+    except KeyError:
+        return
+
+
 def get_supported_languages_md():
     from grep_ast.parsers import PARSERS
 
-    res = ""
+    from aider.linter import Linter
+
+    res = """
+| Language | File extension | Repo map | Linter |
+|:--------:|:--------------:|:--------:|:------:|
+"""
     data = sorted((lang, ex) for ex, lang in PARSERS.items())
+    linter = Linter()
+
     for lang, ext in data:
-        res += "<tr>"
-        res += f'<td style="text-align: center;">{lang:20}</td>\n'
-        res += f'<td style="text-align: center;">{ext:20}</td>\n'
-        res += "</tr>"
+        fn = get_scm_fname(lang)
+        repo_map = "✓" if Path(fn).exists() else ""
+        linter_support = "✓"
+        res += f"| {lang:20} | {ext:20} | {repo_map:^8} | {linter_support:^6} |\n"
+
+    res += "\n"
+
     return res
 
 

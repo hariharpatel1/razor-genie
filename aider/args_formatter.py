@@ -91,10 +91,14 @@ class YamlHelpFormatter(argparse.HelpFormatter):
     def _format_text(self, text):
         return """
 ##########################################################
-# Sample .aider.conf.yaml
+# Sample .aider.conf.yml
 # This file lists *all* the valid configuration entries.
 # Place in your home dir, or at the root of your git repo.
 ##########################################################
+
+# Note: You can only put OpenAI and Anthropic API keys in the yaml
+# config file. Keys for all APIs can be stored in a .env file
+# https://aider.chat/docs/config/dotenv.html
 
 """
 

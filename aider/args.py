@@ -142,13 +142,13 @@ def get_parser(default_config_files, git_root):
     group.add_argument(
         "--model-settings-file",
         metavar="MODEL_SETTINGS_FILE",
-        default=None,
+        default=".aider.model.settings.yml",
         help="Specify a file with aider model settings for unknown models",
     )
     group.add_argument(
         "--model-metadata-file",
         metavar="MODEL_METADATA_FILE",
-        default=None,
+        default=".aider.model.metadata.json",
         help="Specify a file with context window and costs for unknown models",
     )
     group.add_argument(
@@ -320,6 +320,12 @@ def get_parser(default_config_files, git_root):
         help="Specify the aider ignore file (default: .aiderignore in git root)",
     )
     group.add_argument(
+        "--subtree-only",
+        action="store_true",
+        help="Only consider files in the current subtree of the git repository",
+        default=False,
+    )
+    group.add_argument(
         "--auto-commits",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -350,18 +356,23 @@ def get_parser(default_config_files, git_root):
         help="Prefix commit messages with 'aider: ' (default: False)",
     )
     group.add_argument(
+        "--commit",
+        action="store_true",
+        help="Commit all pending changes with a suitable commit message, then exit",
+        default=False,
+    )
+    group.add_argument(
+        "--commit-prompt",
+        metavar="PROMPT",
+        help="Specify a custom prompt for generating commit messages",
+    )
+    group.add_argument(
         "--dry-run",
         action=argparse.BooleanOptionalAction,
         default=False,
         help="Perform a dry run without modifying files (default: False)",
     )
     group = parser.add_argument_group("Fixing and committing")
-    group.add_argument(
-        "--commit",
-        action="store_true",
-        help="Commit all pending changes with a suitable commit message, then exit",
-        default=False,
-    )
     group.add_argument(
         "--lint",
         action="store_true",
@@ -385,7 +396,6 @@ def get_parser(default_config_files, git_root):
     )
     group.add_argument(
         "--test-cmd",
-        action="append",
         help="Specify command to run tests",
         default=[],
     )
@@ -405,6 +415,12 @@ def get_parser(default_config_files, git_root):
     ##########
     group = parser.add_argument_group("Other Settings")
     group.add_argument(
+        "--file",
+        action="append",
+        metavar="FILE",
+        help="specify a file to edit (can be used multiple times)",
+    )
+    group.add_argument(
         "--vim",
         action="store_true",
         help="Use VI editing mode in the terminal (default: False)",
@@ -423,15 +439,16 @@ def get_parser(default_config_files, git_root):
         help="Show the version number and exit",
     )
     group.add_argument(
-        "--check-update",
+        "--just-check-update",
         action="store_true",
         help="Check for updates and return status in the exit code",
         default=False,
     )
     group.add_argument(
-        "--skip-check-update",
-        action="store_true",
-        help="Skips checking for the update when the program runs",
+        "--check-update",
+        action=argparse.BooleanOptionalAction,
+        help="Check for new aider versions on launch",
+        default=True,
     )
     group.add_argument(
         "--apply",
@@ -461,6 +478,12 @@ def get_parser(default_config_files, git_root):
         "--show-prompts",
         action="store_true",
         help="Print the system prompts and exit (debug)",
+        default=False,
+    )
+    group.add_argument(
+        "--exit",
+        action="store_true",
+        help="Do all startup activities then exit before accepting user input (debug)",
         default=False,
     )
     group.add_argument(

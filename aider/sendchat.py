@@ -2,10 +2,9 @@ import hashlib
 import json
 
 import backoff
-import httpx
 
 from aider.dump import dump  # noqa: F401
-from aider.litellm import litellm
+from aider.llm import litellm
 
 # from diskcache import Cache
 
@@ -15,40 +14,62 @@ CACHE = None
 # CACHE = Cache(CACHE_PATH)
 
 
-def should_giveup(e):
-    if not hasattr(e, "status_code"):
-        return False
+def lazy_litellm_retry_decorator(func):
+    def wrapper(*args, **kwargs):
+        import httpx
 
-    if type(e) in (
-        httpx.ConnectError,
-        httpx.RemoteProtocolError,
-        httpx.ReadTimeout,
-    ):
-        return False
+        def should_giveup(e):
+            if not hasattr(e, "status_code"):
+                return False
 
-    return not litellm._should_retry(e.status_code)
+            if type(e) in (
+                httpx.ConnectError,
+                httpx.RemoteProtocolError,
+                httpx.ReadTimeout,
+            ):
+                return False
+
+            # These seem to return .status_code = ""
+            # litellm._should_retry() expects an int and throws a TypeError
+            #
+            # litellm.llms.anthropic.AnthropicError
+            # litellm.exceptions.APIError
+            if not e.status_code:
+                return False
+
+            return not litellm._should_retry(e.status_code)
+
+        decorated_func = backoff.on_exception(
+            backoff.expo,
+            (
+                httpx.ConnectError,
+                httpx.RemoteProtocolError,
+                httpx.ReadTimeout,
+                litellm.exceptions.APIConnectionError,
+                litellm.exceptions.APIError,
+                litellm.exceptions.RateLimitError,
+                litellm.exceptions.ServiceUnavailableError,
+                litellm.exceptions.Timeout,
+                litellm.exceptions.InternalServerError,
+                litellm.llms.anthropic.AnthropicError,
+            ),
+            giveup=should_giveup,
+            max_time=60,
+            on_backoff=lambda details: print(
+                f"{details.get('exception', 'Exception')}\nRetry in {details['wait']:.1f} seconds."
+            ),
+        )(func)
+        return decorated_func(*args, **kwargs)
+
+    return wrapper
 
 
-@backoff.on_exception(
-    backoff.expo,
-    (
-        httpx.ConnectError,
-        httpx.RemoteProtocolError,
-        httpx.ReadTimeout,
-        litellm.exceptions.APIConnectionError,
-        litellm.exceptions.APIError,
-        litellm.exceptions.RateLimitError,
-        litellm.exceptions.ServiceUnavailableError,
-        litellm.exceptions.Timeout,
-        litellm.llms.anthropic.AnthropicError,
-    ),
-    giveup=should_giveup,
-    max_time=60,
-    on_backoff=lambda details: print(
-        f"{details.get('exception','Exception')}\nRetry in {details['wait']:.1f} seconds."
-    ),
-)
-def send_with_retries(model_name, messages, functions, stream, temperature=0):
+@lazy_litellm_retry_decorator
+def send_with_retries(
+    model_name, messages, functions, stream, temperature=0, extra_headers=None, max_tokens=None
+):
+    from aider.llm import litellm
+
     kwargs = dict(
         model=model_name,
         messages=messages,
@@ -57,6 +78,10 @@ def send_with_retries(model_name, messages, functions, stream, temperature=0):
     )
     if functions is not None:
         kwargs["functions"] = functions
+    if extra_headers is not None:
+        kwargs["extra_headers"] = extra_headers
+    if max_tokens is not None:
+        kwargs["max_tokens"] = max_tokens
 
     key = json.dumps(kwargs, sort_keys=True).encode()
 

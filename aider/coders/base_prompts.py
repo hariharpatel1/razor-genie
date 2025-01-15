@@ -1,4 +1,6 @@
 class CoderPrompts:
+    system_reminder = ""
+
     files_content_gpt_edits = "I committed the changes with git hash {hash} & commit msg: {message}"
 
     files_content_gpt_edits_no_repo = "I updated the files."
@@ -27,6 +29,11 @@ Tell me which files in my repo are the most likely to **need changes** to solve 
 Only include the files that are most likely to actually need to be edited.
 Don't include files that might contain relevant context, just files that will need to be changed.
 """  # noqa: E501
+
+    files_no_full_files_with_repo_map_reply = (
+        "Ok, based on your requests I will suggest which files need to be edited and then"
+        " stop and wait for your approval."
+    )
 
     repo_content_prefix = """Here are summaries of some files present in my git repository.
 Do not propose changes to these files, treat them as *read-only*.

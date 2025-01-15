@@ -13,11 +13,9 @@ from .editblock_prompts import EditBlockPrompts
 
 
 class EditBlockCoder(Coder):
+    """A coder that uses search/replace blocks for code modifications."""
     edit_format = "diff"
-
-    def __init__(self, *args, **kwargs):
-        self.gpt_prompts = EditBlockPrompts()
-        super().__init__(*args, **kwargs)
+    gpt_prompts = EditBlockPrompts()
 
     def get_edits(self):
         content = self.partial_response_content
@@ -78,7 +76,7 @@ class EditBlockCoder(Coder):
 
 """
 
-            if updated in content:
+            if updated in content and updated:
                 res += f"""Are you sure you need this SEARCH/REPLACE block?
 The REPLACE lines are already in {path}!
 

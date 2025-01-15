@@ -23,7 +23,6 @@ from .utils import is_image_file
 
 class AutoCompleter(Completer):
     def __init__(self, root, rel_fnames, addable_rel_fnames, commands, encoding):
-        self.commands = commands
         self.addable_rel_fnames = addable_rel_fnames
         self.rel_fnames = rel_fnames
         self.encoding = encoding
@@ -36,6 +35,11 @@ class AutoCompleter(Completer):
         self.fname_to_rel_fnames = fname_to_rel_fnames
 
         self.words = set()
+
+        self.commands = commands
+        self.command_completions = dict()
+        if commands:
+            self.command_names = self.commands.get_commands()
 
         for rel_fname in addable_rel_fnames:
             self.words.add(rel_fname)
@@ -56,6 +60,36 @@ class AutoCompleter(Completer):
             tokens = list(lexer.get_tokens(content))
             self.words.update(token[1] for token in tokens if token[0] in Token.Name)
 
+    def get_command_completions(self, text, words):
+        candidates = []
+        if len(words) == 1 and not text[-1].isspace():
+            partial = words[0].lower()
+            candidates = [cmd for cmd in self.command_names if cmd.startswith(partial)]
+            return candidates
+
+        if len(words) <= 1:
+            return []
+        if text[-1].isspace():
+            return []
+
+        cmd = words[0]
+        partial = words[-1].lower()
+
+        if cmd not in self.command_names:
+            return
+
+        if cmd not in self.command_completions:
+            candidates = self.commands.get_completions(cmd)
+            self.command_completions[cmd] = candidates
+        else:
+            candidates = self.command_completions[cmd]
+
+        if candidates is None:
+            return
+
+        candidates = [word for word in candidates if partial in word.lower()]
+        return candidates
+
     def get_completions(self, document, complete_event):
         text = document.text_before_cursor
         words = text.split()
@@ -63,17 +97,15 @@ class AutoCompleter(Completer):
             return
 
         if text[0] == "/":
-            if len(words) == 1 and not text[-1].isspace():
-                candidates = self.commands.get_commands()
-                candidates = [(cmd, cmd) for cmd in candidates]
-            else:
-                for completion in self.commands.get_command_completions(words[0][1:], words[-1]):
-                    yield completion
+            candidates = self.get_command_completions(text, words)
+            if candidates is not None:
+                for candidate in candidates:
+                    yield Completion(candidate, start_position=-len(words[-1]))
                 return
-        else:
-            candidates = self.words
-            candidates.update(set(self.fname_to_rel_fnames))
-            candidates = [(word, f"`{word}`") for word in candidates]
+
+        candidates = self.words
+        candidates.update(set(self.fname_to_rel_fnames))
+        candidates = [(word, f"`{word}`") for word in candidates]
 
         last_word = words[-1]
         for word_match, word_insert in candidates:
@@ -277,8 +309,8 @@ class InputOutput:
     def log_llm_history(self, role, content):
         if not self.llm_history_file:
             return
-        timestamp = datetime.now().isoformat(timespec='seconds')
-        with open(self.llm_history_file, 'a', encoding=self.encoding) as log_file:
+        timestamp = datetime.now().isoformat(timespec="seconds")
+        with open(self.llm_history_file, "a", encoding=self.encoding) as log_file:
             log_file.write(f"{role.upper()} {timestamp}\n")
             log_file.write(content + "\n")
 

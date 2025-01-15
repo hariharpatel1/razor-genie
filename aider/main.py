@@ -2,20 +2,20 @@ import configparser
 import os
 import re
 import sys
+import threading
 from pathlib import Path
 
 import git
-import httpx
 from dotenv import load_dotenv
 from prompt_toolkit.enums import EditingMode
-from streamlit.web import cli
 
 from aider import __version__, models, utils
 from aider.args import get_parser
 from aider.coders import Coder
-from aider.commands import SwitchModel
+from aider.commands import Commands, SwitchCoder
+from aider.history import ChatSummary
 from aider.io import InputOutput
-from aider.litellm import litellm  # noqa: F401; properly init litellm on launch
+from aider.llm import litellm  # noqa: F401; properly init litellm on launch
 from aider.repo import GitRepo
 from aider.versioncheck import check_version
 
@@ -141,15 +141,28 @@ def format_settings(parser, args):
 
 
 def scrub_sensitive_info(args, text):
-    # Replace sensitive information with placeholder
+    # Replace sensitive information with last 4 characters
     if text and args.openai_api_key:
-        text = text.replace(args.openai_api_key, "***")
+        last_4 = args.openai_api_key[-4:]
+        text = text.replace(args.openai_api_key, f"...{last_4}")
     if text and args.anthropic_api_key:
-        text = text.replace(args.anthropic_api_key, "***")
+        last_4 = args.anthropic_api_key[-4:]
+        text = text.replace(args.anthropic_api_key, f"...{last_4}")
     return text
 
 
+def check_streamlit_install(io):
+    return utils.check_pip_install_extra(
+        io,
+        "streamlit",
+        "You need to install the aider browser feature",
+        ["aider-chat[browser]"],
+    )
+
+
 def launch_gui(args):
+    from streamlit.web import cli
+
     from aider import gui
 
     print()
@@ -219,46 +232,76 @@ def generate_search_path_list(default_fname, git_root, command_line_file):
     files.append(Path.home() / default_file)  # homedir
     if git_root:
         files.append(Path(git_root) / default_file)  # git root
+    files.append(default_file.resolve())
     if command_line_file:
         files.append(command_line_file)
-    files.append(default_file.resolve())
+    files = [Path(fn).resolve() for fn in files]
+    files.reverse()
+    uniq = []
+    for fn in files:
+        if fn not in uniq:
+            uniq.append(fn)
+    uniq.reverse()
+    files = uniq
     files = list(map(str, files))
     files = list(dict.fromkeys(files))
 
     return files
 
 
-def register_models(git_root, model_settings_fname, io):
+def register_models(git_root, model_settings_fname, io, verbose=False):
     model_settings_files = generate_search_path_list(
-        ".aider.models.yml", git_root, model_settings_fname
+        ".aider.model.settings.yml", git_root, model_settings_fname
     )
 
     try:
         files_loaded = models.register_models(model_settings_files)
         if len(files_loaded) > 0:
-            io.tool_output(f"Loaded {len(files_loaded)} model settings file(s)")
-            for file_loaded in files_loaded:
-                io.tool_output(f"  - {file_loaded}")
+            if verbose:
+                io.tool_output("Loaded model settings from:")
+                for file_loaded in files_loaded:
+                    io.tool_output(f"  - {file_loaded}")  # noqa: E221
+        elif verbose:
+            io.tool_output("No model settings files loaded")
     except Exception as e:
         io.tool_error(f"Error loading aider model settings: {e}")
         return 1
 
+    if verbose:
+        io.tool_output("Searched for model settings files:")
+        for file in model_settings_files:
+            io.tool_output(f"  - {file}")
+
     return None
 
 
-def register_litellm_models(git_root, model_metadata_fname, io):
+def load_dotenv_files(git_root, dotenv_fname):
+    dotenv_files = generate_search_path_list(
+        ".env",
+        git_root,
+        dotenv_fname,
+    )
+    loaded = []
+    for fname in dotenv_files:
+        if Path(fname).exists():
+            loaded.append(fname)
+            load_dotenv(fname, override=True)
+    return loaded
+
+
+def register_litellm_models(git_root, model_metadata_fname, io, verbose=False):
     model_metatdata_files = generate_search_path_list(
-        ".aider.litellm.models.json", git_root, model_metadata_fname
+        ".aider.model.metadata.json", git_root, model_metadata_fname
     )
 
     try:
         model_metadata_files_loaded = models.register_litellm_models(model_metatdata_files)
-        if len(model_metadata_files_loaded) > 0:
-            io.tool_output(f"Loaded {len(model_metadata_files_loaded)} litellm model file(s)")
+        if len(model_metadata_files_loaded) > 0 and verbose:
+            io.tool_output("Loaded model metadata from:")
             for model_metadata_file in model_metadata_files_loaded:
-                io.tool_output(f"  - {model_metadata_file}")
+                io.tool_output(f"  - {model_metadata_file}")  # noqa: E221
     except Exception as e:
-        io.tool_error(f"Error loading litellm models: {e}")
+        io.tool_error(f"Error loading model metadata models: {e}")
         return 1
 
 
@@ -285,18 +328,16 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
     args, unknown = parser.parse_known_args(argv)
 
     # Load the .env file specified in the arguments
-    if hasattr(args, "env_file"):
-        load_dotenv(args.env_file)
+    loaded_dotenvs = load_dotenv_files(git_root, args.env_file)
 
     # Parse again to include any arguments that might have been defined in .env
     args = parser.parse_args(argv)
 
     if not args.verify_ssl:
-        litellm.client_session = httpx.Client(verify=False)
+        import httpx
 
-    if args.gui and not return_coder:
-        launch_gui(argv)
-        return
+        litellm._load_litellm()
+        litellm._lazy_module.client_session = httpx.Client(verify=False)
 
     if args.dark_mode:
         args.user_input_color = "#32FF32"
@@ -331,10 +372,21 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
         editingmode=editing_mode,
     )
 
-    fnames = [str(Path(fn).resolve()) for fn in args.files]
-    if len(args.files) > 1:
+    if args.gui and not return_coder:
+        if not check_streamlit_install(io):
+            return
+        launch_gui(argv)
+        return
+
+    if args.verbose:
+        for fname in loaded_dotenvs:
+            io.tool_output(f"Loaded {fname}")
+
+    all_files = args.files + (args.file or [])
+    fnames = [str(Path(fn).resolve()) for fn in all_files]
+    if len(all_files) > 1:
         good = True
-        for fname in args.files:
+        for fname in all_files:
             if Path(fname).is_dir():
                 io.tool_error(f"{fname} is a directory, not provided alone.")
                 good = False
@@ -345,13 +397,13 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
             return 1
 
     git_dname = None
-    if len(args.files) == 1:
-        if Path(args.files[0]).is_dir():
+    if len(all_files) == 1:
+        if Path(all_files[0]).is_dir():
             if args.git:
-                git_dname = str(Path(args.files[0]).resolve())
+                git_dname = str(Path(all_files[0]).resolve())
                 fnames = []
             else:
-                io.tool_error(f"{args.files[0]} is a directory, but --no-git selected.")
+                io.tool_error(f"{all_files[0]} is a directory, but --no-git selected.")
                 return 1
 
     # We can't know the git repo for sure until after parsing the args.
@@ -362,12 +414,12 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
         if right_repo_root:
             return main(argv, input, output, right_repo_root, return_coder=return_coder)
 
-    if not args.skip_check_update:
-        check_version(io.tool_error)
+    if args.just_check_update:
+        update_available = check_version(io, just_check=True)
+        return 0 if not update_available else 1
 
     if args.check_update:
-        update_available = check_version(lambda msg: None)
-        return 0 if not update_available else 1
+        check_version(io)
 
     if args.models:
         models.print_matching_models(io, args.models)
@@ -400,8 +452,8 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
     if args.openai_organization_id:
         os.environ["OPENAI_ORGANIZATION"] = args.openai_organization_id
 
-    register_models(git_root, args.model_settings_file, io)
-    register_litellm_models(git_root, args.model_metadata_file, io)
+    register_models(git_root, args.model_settings_file, io, verbose=args.verbose)
+    register_litellm_models(git_root, args.model_metadata_file, io, verbose=args.verbose)
 
     if not args.model:
         args.model = "gpt-4o"
@@ -417,14 +469,38 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
     if args.show_model_warnings:
         models.sanity_check_models(io, main_model)
 
+    repo = None
+    if args.git:
+        try:
+            repo = GitRepo(
+                io,
+                fnames,
+                git_dname or ".",
+                args.aiderignore,
+                models=main_model.commit_message_models(),
+                attribute_author=args.attribute_author,
+                attribute_committer=args.attribute_committer,
+                attribute_commit_message=args.attribute_commit_message,
+                commit_prompt=args.commit_prompt,
+                subtree_only=args.subtree_only,
+            )
+        except FileNotFoundError:
+            pass
+
+    commands = Commands(io, None, verify_ssl=args.verify_ssl)
+
+    summarizer = ChatSummary(
+        [main_model.weak_model, main_model],
+        args.max_chat_history_tokens or main_model.max_chat_history_tokens,
+    )
+
     try:
         coder = Coder.create(
             main_model=main_model,
             edit_format=args.edit_format,
             io=io,
-            ##
+            repo=repo,
             fnames=fnames,
-            git_dname=git_dname,
             pretty=args.pretty,
             show_diffs=args.show_diffs,
             auto_commits=args.auto_commits,
@@ -436,17 +512,13 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
             code_theme=args.code_theme,
             stream=args.stream,
             use_git=args.git,
-            voice_language=args.voice_language,
-            aider_ignore_file=args.aiderignore,
-            max_chat_history_tokens=args.max_chat_history_tokens,
             restore_chat_history=args.restore_chat_history,
             auto_lint=args.auto_lint,
             auto_test=args.auto_test,
             lint_cmds=lint_cmds,
             test_cmd=args.test_cmd,
-            attribute_author=args.attribute_author,
-            attribute_committer=args.attribute_committer,
-            attribute_commit_message=args.attribute_commit_message,
+            commands=commands,
+            summarizer=summarizer,
         )
 
     except ValueError as err:
@@ -466,16 +538,8 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
         utils.show_messages(messages)
         return
 
-    if args.commit:
-        if args.dry_run:
-            io.tool_output("Dry run enabled, skipping commit.")
-        else:
-            coder.commands.cmd_commit()
-        return
-
     if args.lint:
         coder.commands.cmd_lint(fnames=fnames)
-        return
 
     if args.test:
         if not args.test_cmd:
@@ -484,6 +548,14 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
         test_errors = coder.commands.cmd_test(args.test_cmd)
         if test_errors:
             coder.run(test_errors)
+
+    if args.commit:
+        if args.dry_run:
+            io.tool_output("Dry run enabled, skipping commit.")
+        else:
+            coder.commands.cmd_commit()
+
+    if args.lint or args.test or args.commit:
         return
 
     if args.show_repo_map:
@@ -504,7 +576,7 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
         args.pretty = False
         io.tool_output("VSCode terminal detected, pretty output has been disabled.")
 
-    io.tool_output("Use /help to see in-chat commands, run with --help to see cmd line args")
+    io.tool_output('Use /help <question> for help, run "aider --help" to see cmd line args')
 
     if git_root and Path.cwd().resolve() != Path(git_root).resolve():
         io.tool_error(
@@ -534,13 +606,35 @@ def main(argv=None, input=None, output=None, force_git_root=None, return_coder=F
             return 1
         return
 
+    if args.exit:
+        return
+
+    thread = threading.Thread(target=load_slow_imports)
+    thread.daemon = True
+    thread.start()
+
     while True:
         try:
             coder.run()
             return
-        except SwitchModel as switch:
-            coder = Coder.create(main_model=switch.model, io=io, from_coder=coder)
+        except SwitchCoder as switch:
+            coder = Coder.create(io=io, from_coder=coder, **switch.kwargs)
             coder.show_announcements()
+
+
+def load_slow_imports():
+    # These imports are deferred in various ways to
+    # improve startup time.
+    # This func is called in a thread to load them in the background
+    # while we wait for the user to type their first message.
+
+    try:
+        import httpx  # noqa: F401
+        import litellm  # noqa: F401
+        import networkx  # noqa: F401
+        import numpy  # noqa: F401
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
